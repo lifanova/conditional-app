@@ -1,6 +1,7 @@
 package ru.netology.conditional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +17,19 @@ class ConditionalApplicationTests {
     @Autowired
     private TestRestTemplate restTemplate;
     @Container
-    private final GenericContainer<?> devApp = new GenericContainer<>("devapp:latest")
+    private static final GenericContainer<?> devApp = new GenericContainer<>("devapp:latest")
             .withExposedPorts(8080);
     @Container
-    private final GenericContainer<?> prodApp = new GenericContainer<>("prodapp:latest")
+    private static final GenericContainer<?> prodApp = new GenericContainer<>("prodapp:latest")
             .withExposedPorts(8081);
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         devApp.start();
         prodApp.start();
     }
 
     @Test
-    void firstContextLoad() {
+    public void firstContextLoad() {
         var port = devApp.getMappedPort(8080);
         ResponseEntity<String> forEntity = restTemplate.getForEntity(HOST + port + "/profile", String.class);
         System.out.println("Port: " + port);
@@ -40,7 +41,7 @@ class ConditionalApplicationTests {
     }
 
     @Test
-    void secondContextLoad() {
+    public void secondContextLoad() {
         var port = prodApp.getMappedPort(8081);
         ResponseEntity<String> forEntity = restTemplate.getForEntity(HOST + port + "/profile", String.class);
         System.out.println("Port: " + port);
